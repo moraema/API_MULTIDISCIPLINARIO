@@ -22,7 +22,7 @@ const getAdmin = async(req, res) => {
 const getProduct = async(req, res) => {
     try {
         const results = await new Promise((resolve, reject) => {
-            db.query('SELECT productos.*, categoria.categoria AS categoria FROM productos INNER JOIN categoria ON productos.categoria_id_categoria = categoria.id_categoria', (err, results) => {
+            db.query('SELECT productos.*, categorias.categoria AS categorias FROM productos INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria', (err, results) => {
                 if (err) reject(err);
                 else(resolve)(results);
             });
