@@ -1,0 +1,29 @@
+utiliza los productos filtrados en las secciones correspondientes de tu frontend
+const productsWithCategory1 = products.filter(product => product.id_categoria === 1);
+const productsWithCategory2 = products.filter(product => product.id_categoria === 2);
+
+asi se puede filtrar en la query donde pido los productos y asi no hacer muchas consultas
+
+
+
+// productos sin limit
+ const getVentaProduct = async(req, res) => {
+        try {
+
+            const VentasProduct = await new Promise((resolve, reject) => {
+                db.query('SELECT * FROM ventas_productos', (err, results) => {
+                    if (err) reject(err);
+                    else resolve(results);
+                });
+            });
+            res.status(200).json({
+                message: ' se obtuvieron correctamente los productos vendidos',
+                data: VentasProduct
+            });
+        } catch (error) {
+            return res.status(500).json({
+                message: 'ocurrion un error al obtener los productos vendidos',
+                error: error.message
+            })
+        }
+    }
