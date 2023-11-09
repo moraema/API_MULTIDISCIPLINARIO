@@ -61,13 +61,13 @@ const CreateClient = async(req, res) => {
 };
 
 const payments = async(req, res) => {
-    const { id, amount, descripcion } = req.body;
+    const { id, amount } = req.body;
 
     try {
         const payment = await stripe.paymentIntents.create({
             amount,
             currency: "MXN",
-            description: descripcion,
+            description: "pagos de productos",
             payment_method: id,
             confirm: true
 

@@ -19,6 +19,7 @@ const login = async(req, res) => {
                         message: 'hubo un error al iniciar sesión',
                         error: error.message
                     });
+
                 }
                 if (results.length == 0) {
                     return res.status(400).json({
@@ -35,6 +36,8 @@ const login = async(req, res) => {
                         message: 'usuario o contraseña incorrectos'
                     });
                 }
+
+
 
                 const payload = {
                     cliente: {
