@@ -5,8 +5,11 @@ const getPedidos = async(req, res) => {
     try {
         const ventas = await new Promise((resolve, reject) => {
             db.query('SELECT p.id_pedido, p.detalle_pedido, p.total, p.pedido_fecha, p.id_clientes, p.id_metodo_pago, mp.metodo_pago, c.nombre, c.apellido, c.ubicacion, c.telefono FROM pedidos p JOIN clientes c ON p.id_clientes = c.id_clientes JOIN metodo_pago mp ON p.id_metodo_pago = mp.id_metodo_pago;', (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
         });
 
@@ -72,8 +75,11 @@ const getVentaProduct = async(req, res) => {
                     cantidad_total DESC
                 LIMIT ${limit} OFFSET ${offset}
             `, (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
         });
 
@@ -116,8 +122,11 @@ const deletePedido = async(req, res) => {
 
         const result = await new Promise((resolve, reject) => {
             db.query('DELETE FROM pedidos WHERE id_pedido = ?', [pedidoId], (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
         });
         if (result.affectedRows === 0) {

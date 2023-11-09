@@ -7,7 +7,7 @@ const authRouter = require('./src/routes/auth.cliente.route');
 const app = express();
 
 app.use(bodyParser.json());
-app.use('/clientes', usuariosRouter);
+app.use('/usuarios', usuariosRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 
