@@ -1,7 +1,9 @@
 const db = require('../configs/db.configs');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
+const Stripe = require("stripe");
 const stripe = require('stripe')('sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn56uUitmybjSJvJfZdvoOnqc4NggtMa03cRjA0ZKCv718LJJPnrb00Gn0sMvkf');
+
 
 
 
@@ -164,7 +166,11 @@ const CreatePedido = async(req, res) => {
 
 
 
-const payments = async(req, res) => {
+
+
+
+const pagos = async(req, res) => {
+
     try {
         const { amount, descripcion, pago, nombre } = req.body;
 
@@ -198,7 +204,7 @@ const payments = async(req, res) => {
 module.exports = {
     getProduct,
     CreateClient,
-    payments,
+    pagos,
     getCliente,
     updateubicacion,
     CreatePedido
