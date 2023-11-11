@@ -1,8 +1,7 @@
 const db = require('../configs/db.configs');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
-const Stripe = require("stripe");
-const stripe = new Stripe("sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn56uUitmybjSJvJfZdvoOnqc4NggtMa03cRjA0ZKCv718LJJPnrb00Gn0sMvkf")
+const stripe = require('stripe')('sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn56uUitmybjSJvJfZdvoOnqc4NggtMa03cRjA0ZKCv718LJJPnrb00Gn0sMvkf');
 
 
 
@@ -32,6 +31,7 @@ const getProduct = async(req, res) => {
         });
     }
 }
+
 
 
 
@@ -162,31 +162,37 @@ const CreatePedido = async(req, res) => {
     }
 }
 
-const payments = async(req, res) => {
-    const { id, amount } = req.body;
 
+
+const payments = async(req, res) => {
     try {
-        const payment = await stripe.paymentIntents.create({
-            amount,
-            currency: "MXN",
-            description: "pagos de productos",
-            payment_method: id,
-            confirm: true
+        const { amount, descripcion, pago, nombre } = req.body;
+
+
+        const customer = await stripe.customers.create({
+            name: nombre,
 
         });
 
-        console.log(payment);
+        const amountInCents = pago.toLowerCase() === 'mxn' ? amount * 100 : amount;
 
-        return res.status(200).json({
-            message: 'el pago se efectu de manera correcta'
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amountInCents,
+            currency: pago,
+            description: descripcion,
+            customer: customer.id,
+        });
+
+        res.json({
+            clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id,
+            customerId: customer.id, // Aquí obtienes el ID del cliente recién creado
         });
     } catch (error) {
-        return res.status(500).json({
-            message: 'hubo un error al realizar el pago',
-            error: error.message
-        })
+        console.error('Error al crear el pago:', error);
+        res.status(500).send('Error al crear el pago');
     }
-}
+};
 
 
 module.exports = {
