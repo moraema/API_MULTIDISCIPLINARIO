@@ -1,7 +1,6 @@
 const db = require('../configs/db.configs');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
-const Stripe = require("stripe");
 const stripe = require('stripe')('sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn56uUitmybjSJvJfZdvoOnqc4NggtMa03cRjA0ZKCv718LJJPnrb00Gn0sMvkf');
 
 
@@ -70,10 +69,10 @@ const CreateClient = async(req, res) => {
 const getCliente = async(req, res) => {
     try {
 
-        const { id } = req.params;
+        const clienteAutenticado = req.cliente.id;
 
         const Clientes = await new Promise((resolve, reject) => {
-            db.query('SELECT id_clientes, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_clientes = ?;', [id], (err, results) => {
+            db.query('SELECT id_clientes, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_clientes = ?;', [clienteAutenticado], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -104,14 +103,14 @@ const getCliente = async(req, res) => {
 const updateubicacion = async(req, res) => {
     try {
 
-        const { id } = req.params;
+        const clienteAutenticado = req.cliente.id;
         const { ubicacion } = req.body;
 
 
         const queryCliente = 'UPDATE clientes SET ubicacion = ? WHERE id_clientes = ?;'
 
         const client = await new Promise((resolve, reject) => {
-            db.query(queryCliente, [ubicacion, id], (err, results) => {
+            db.query(queryCliente, [ubicacion, clienteAutenticado], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -141,11 +140,12 @@ const updateubicacion = async(req, res) => {
 
 const CreatePedido = async(req, res) => {
     try {
-        const { total, detallePedido, idCliente, idPago } = req.body;
+        const clienteAutenticado = req.cliente.id;
+        const { total, detallePedido, idPago } = req.body;
 
         const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_clientes, id_metodo_pago) VALUES (?, ?, ?, ?)';
 
-        db.query(queryPedido, [total, detallePedido, idCliente, idPago], (error, result) => {
+        db.query(queryPedido, [total, detallePedido, clienteAutenticado, idPago], (error, result) => {
             if (error) {
                 res.status(500).json({
                     message: 'hubo un error al realizar el pedido',
@@ -159,7 +159,8 @@ const CreatePedido = async(req, res) => {
         });
     } catch (error) {
         res.status(500).json({
-            message: 'hubo un error al realizar el pedido'
+            message: 'hubo un error al realizar el pedido',
+            error: error.message
         })
     }
 }
