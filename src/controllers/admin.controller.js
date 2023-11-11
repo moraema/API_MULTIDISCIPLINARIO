@@ -28,6 +28,7 @@ const getPedidos = async(req, res) => {
 
 const insertVenta = async(req, res) => {
     try {
+
         const { detalles, subtotal, total, idCliente, idPago } = req.body;
 
         const queryVentas = 'INSERT INTO venta (detalles, subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?, ?)';
