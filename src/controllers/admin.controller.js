@@ -4,7 +4,7 @@ const db = require('../configs/db.configs');
 const getPedidos = async(req, res) => {
     try {
         const ventas = await new Promise((resolve, reject) => {
-            db.query('SELECT p.id_pedido, p.detalle_pedido, p.total, p.pedido_fecha, p.id_clientes, p.id_metodo_pago, mp.metodo_pago, c.nombre, c.apellido, c.ubicacion, c.telefono FROM pedidos p JOIN clientes c ON p.id_clientes = c.id_clientes JOIN metodo_pago mp ON p.id_metodo_pago = mp.id_metodo_pago;', (err, results) => {
+            db.query('SELECT p.id_pedido, p.detalle_pedido, p.total, p.pedido_fecha, p.id_clientes, p.id_metodo_pago, mp.metodo_pago, c.nombre, c.apellido, c.ubicacion, c.telefono FROM pedidos p JOIN clientes c ON p.id_clientes = c.id_clientes JOIN metodo_pago mp ON p.id_metodo_pago = mp.id_metodo_pago ORDER BY pedido_fecha ASC;', (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -159,7 +159,7 @@ const productoVenta = async(req, res) => {
         db.query(queryproductosVentas, [cantidad, total, idproductos, idVentas], (error, result) => {
             if (error) {
                 res.status(500).json({
-                    message: 'bubo un error al insertar los datos',
+                    message: 'hubo un error al insertar los datos',
                     error: error.message
                 });
             } else {
@@ -176,12 +176,17 @@ const productoVenta = async(req, res) => {
     }
 };
 
+
+
+
+
 module.exports = {
     getPedidos,
     getVentaProduct,
     insertVenta,
     deletePedido,
-    productoVenta
+    productoVenta,
+
 }
 
 // pendiente para componer la parte de las ventas y ventas del pructo para insertar en ventas y ventas_producto serian insert venta y producto venat
