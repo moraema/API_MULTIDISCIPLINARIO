@@ -10,4 +10,5 @@ router.post('/ventas-productos', authMidleware.verificarJwt, adminController.pro
 router.delete('/pedidos/:id', authMidleware.verificarJwt, adminController.deletePedido);
 
 
+
 module.exports = router;
