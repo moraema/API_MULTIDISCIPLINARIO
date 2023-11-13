@@ -4,13 +4,30 @@ const db = require('../configs/db.configs');
 const getPedidos = async(req, res) => {
     try {
         const ventas = await new Promise((resolve, reject) => {
-            db.query('SELECT p.id_pedido, p.detalle_pedido, p.total, p.pedido_fecha, p.id_clientes, p.id_metodo_pago, mp.metodo_pago, c.nombre, c.apellido, c.ubicacion, c.telefono FROM pedidos p JOIN clientes c ON p.id_clientes = c.id_clientes JOIN metodo_pago mp ON p.id_metodo_pago = mp.id_metodo_pago ORDER BY pedido_fecha ASC;', (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results);
-                }
-            });
+            db.query(`SELECT 
+                     p.id_pedido, 
+                     p.detalle_pedido, 
+                     p.total, 
+                     p.pedido_fecha, 
+                     p.id_clientes, 
+                     p.id_metodo_pago, 
+                     mp.metodo_pago, 
+                     c.nombre, 
+                     c.apellido, 
+                     c.ubicacion, 
+                     c.telefono
+                     FROM pedidos p 
+                     JOIN clientes c ON p.id_clientes = c.id_clientes 
+                     JOIN metodos_pagos mp ON p.id_metodo_pago = mp.id_metodo_pago 
+                     ORDER BY pedido_fecha ASC;`,
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+
+                    } else {
+                        resolve(results);
+                    }
+                });
         });
 
         res.status(200).json({
@@ -29,11 +46,11 @@ const getPedidos = async(req, res) => {
 const insertVenta = async(req, res) => {
     try {
 
-        const { detalles, subtotal, total, idCliente, idPago } = req.body;
+        const { subtotal, total, idCliente, idPago } = req.body;
 
-        const queryVentas = 'INSERT INTO venta (detalles, subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?, ?)';
+        const queryVentas = 'INSERT INTO ventas ( subtotal, total, id_cliente, id_metodo_pago) VALUES ( ?, ?, ?, ?)';
 
-        db.query(queryVentas, [detalles, subtotal, total, idCliente, idPago], (error, result) => {
+        db.query(queryVentas, [subtotal, total, idCliente, idPago], (error, result) => {
             if (error) {
                 res.status(500).json({
                     message: 'hubo un error al insertar las ventas',
