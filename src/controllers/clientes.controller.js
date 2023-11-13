@@ -2,8 +2,7 @@ const db = require('../configs/db.configs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
-const stripe = require('stripe')('sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn56uUitmybjSJvJfZdvoOnqc4NggtMa03cRjA0ZKCv718LJJPnrb00Gn0sMvkf');
-
+const stripe = require('stripe')(process.env.SECRET_STRIPE);
 
 
 
@@ -13,7 +12,16 @@ const stripe = require('stripe')('sk_test_51NWAB9K41Y6guxcOOFoiCHcHl8aFYqRWNFAEn
 const getProduct = async(req, res) => {
     try {
         const products = await new Promise((resolve, reject) => {
-            db.query('SELECT productos.*, categorias.categoria AS categorias FROM productos INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria', (err, results) => {
+            db.query(`
+                SELECT 
+                productos.id_productos,
+                productos.nombre_producto,
+                productos.precio,
+                productos.descripcion,
+                productos.imagen,
+                categorias.categoria AS categorias
+                FROM productos
+                INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria;`, (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -49,22 +57,8 @@ const CreateClient = async(req, res) => {
                     error: error.message
                 });
             } else {
-                // Assuming 'result.insertId' is the newly inserted client's ID
-                const clientId = result.insertId;
-
-                // Create JWT payload with client ID
-                const payload = {
-                    cliente: {
-                        id: clientId
-                    }
-                };
-
-                // Generate JWT token
-                const token = jwt.sign(payload, 'eternamente-siempre', { expiresIn: '1h' });
-
-                res.status(201).json({
-                    message: "Los datos se insertaron correctamente en clientes",
-                    token: token
+                res.status(200).json({
+                    message: "Los datos se insertaron correctamente en clientes"
                 });
             }
         });
@@ -86,7 +80,7 @@ const getCliente = async(req, res) => {
         const clienteAutenticado = req.cliente.id;
 
         const Clientes = await new Promise((resolve, reject) => {
-            db.query('SELECT id_clientes, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_clientes = ?;', [clienteAutenticado], (err, results) => {
+            db.query(`SELECT id_clientes, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_clientes = ?;`, [clienteAutenticado], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -207,7 +201,7 @@ const pagos = async(req, res) => {
         res.json({
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
-            customerId: customer.id, // Aquí obtienes el ID del cliente recién creado
+            customerId: customer.id,
         });
     } catch (error) {
         console.error('Error al crear el pago:', error);

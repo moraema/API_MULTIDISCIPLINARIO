@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../configs/db.configs');
+const jwtSecret = process.env.JWT_SECRET;
 
 const loginAdmin = async(req, res) => {
     const { usuario, contraseña } = req.body;
 
     try {
-        db.query('SELECT id_administrador, contraseña FROM administrador WHERE usuario = ?', [usuario], (error, results) => {
+        db.query('SELECT id_administrador, contraseña FROM administradores WHERE usuario = ?', [usuario], (error, results) => {
             if (error) {
                 console.log('error al realizar la consulta: ', error);
 
@@ -34,7 +35,7 @@ const loginAdmin = async(req, res) => {
                                         id: accountId
                                     }
                                 }
-                                const token = jwt.sign(payload, 'eternamente-siempre', { expiresIn: '1h' });
+                                const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
 
                                 res.status(200).json({
                                     message: 'inicio de sesion exitoso',
