@@ -9,7 +9,7 @@ const getPedidos = async(req, res) => {
                      p.detalle_pedido, 
                      p.total, 
                      p.pedido_fecha, 
-                     p.id_clientes, 
+                     p.id_cliente, 
                      p.id_metodo_pago, 
                      mp.metodo_pago, 
                      c.nombre, 
@@ -17,7 +17,7 @@ const getPedidos = async(req, res) => {
                      c.ubicacion, 
                      c.telefono
                      FROM pedidos p 
-                     JOIN clientes c ON p.id_clientes = c.id_clientes 
+                     JOIN clientes c ON p.id_cliente = c.id_cliente
                      JOIN metodos_pagos mp ON p.id_metodo_pago = mp.id_metodo_pago 
                      ORDER BY pedido_fecha ASC;`,
                 (err, results) => {
@@ -32,7 +32,7 @@ const getPedidos = async(req, res) => {
 
         res.status(200).json({
             message: 'se obtuvieron las ventas correctamente',
-            data: ventas
+            initialData: ventas
         });
     } catch (error) {
         return res.status(500).json({
@@ -41,6 +41,8 @@ const getPedidos = async(req, res) => {
         });
     }
 };
+
+
 
 
 const insertVenta = async(req, res) => {
@@ -79,16 +81,16 @@ const getVentaProduct = async(req, res) => {
         const VentasProduct = await new Promise((resolve, reject) => {
             db.query(`
                 SELECT
-                    p.id_productos,
+                    p.id_producto,
                     p.nombre_producto,
                     p.precio,
                     SUM(vp.cantidad) as cantidad_total,
                     SUM(vp.cantidad * p.precio) as total_vendido
                 FROM
                     productos p
-                    JOIN ventas_productos vp ON p.id_productos = vp.id_productos
+                    JOIN ventas_productos vp ON p.id_producto = vp.id_producto
                 GROUP BY
-                    p.id_productos, p.nombre_producto, p.precio
+                    p.id_producto, p.nombre_producto, p.precio
                 ORDER BY
                     cantidad_total DESC
                 LIMIT ${limit} OFFSET ${offset}
@@ -108,7 +110,7 @@ const getVentaProduct = async(req, res) => {
 
         if (page && limit) {
             const totalVentasProduct = await new Promise((resolve, reject) => {
-                db.query('SELECT COUNT(DISTINCT p.id_productos) as total FROM productos p JOIN ventas_productos vp ON p.id_productos = vp.id_productos', (err, results) => {
+                db.query('SELECT COUNT(DISTINCT p.id_producto) as total FROM productos p JOIN ventas_productos vp ON p.id_producto = vp.id_producto', (err, results) => {
                     if (err) reject(err);
                     else resolve(results[0].total);
                 });
@@ -193,18 +195,88 @@ const productoVenta = async(req, res) => {
     }
 };
 
+/*
+const saveTransaction = async(req, res) => {
+    try {
+        const { subtotal, total, idCliente, idPago, cantidad, totalproductos, idproductos } = req.body;
 
 
+        await db.promise().beginTransaction();
+
+
+        const queryVentas = 'INSERT INTO ventas (subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
+        const valuesVentas = [subtotal, total, idCliente, idPago];
+        const [ventasResult] = await db.promise().execute(queryVentas, valuesVentas);
+
+        const idVentas = ventasResult.insertId;
+
+
+        const queryproductosVentas = 'INSERT INTO ventas_productos (cantidad, total, id_producto, id_venta) VALUES (?, ?, ?, ?)';
+        const valuesproductosVentas = [cantidad, totalproductos, idproductos, idVentas];
+        await db.promise().execute(queryproductosVentas, valuesproductosVentas);
+
+
+        await db.promise().commit();
+
+        return res.status(200).json({
+            message: 'Venta creada exitosamente',
+            idVentas: idVentas
+        });
+    } catch (error) {
+        await db.promise().rollback();
+
+        return res.status(500).json({
+            message: 'Ocurrió un error al hacer la venta',
+            error: error.message
+        });
+    }
+};
+*/
+
+const saveTransaction = async(req, res) => {
+    try {
+        const { subtotal, total, idCliente, idPago, productos } = req.body;
+
+        await db.promise().beginTransaction();
+
+        const queryVentas =
+            'INSERT INTO ventas (subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
+        const valuesVentas = [subtotal, total, idCliente, idPago];
+        const [ventasResult] = await db.promise().execute(queryVentas, valuesVentas);
+
+        const idVentas = ventasResult.insertId;
+
+
+        for (const producto of productos) {
+            const { cantidad, totalProducto, idProducto } = producto;
+
+            const queryProductosVentas =
+                'INSERT INTO ventas_productos (cantidad, total, id_producto, id_venta) VALUES (?, ?, ?, ?)';
+            const valuesProductosVentas = [cantidad, totalProducto, idProducto, idVentas];
+            await db.promise().execute(queryProductosVentas, valuesProductosVentas);
+        }
+
+        await db.promise().commit();
+
+        return res.status(200).json({
+            message: 'Venta creada exitosamente',
+            idVentas: idVentas,
+        });
+    } catch (error) {
+        await db.promise().rollback();
+
+        return res.status(500).json({
+            message: 'Ocurrió un error al hacer la venta',
+            error: error.message,
+        });
+    }
+};
 
 
 module.exports = {
     getPedidos,
     getVentaProduct,
-    insertVenta,
+    saveTransaction,
     deletePedido,
-    productoVenta,
 
 }
-
-// pendiente para componer la parte de las ventas y ventas del pructo para insertar en ventas y ventas_producto serian insert venta y producto venat
-// la parte del get para mostrar las veentas y su cantida ya fue realizada y es getventaproduct

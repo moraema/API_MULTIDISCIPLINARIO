@@ -1,7 +1,5 @@
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
-const Bluebird = require('bluebird');
-
 
 dotenv.config();
 
@@ -19,7 +17,5 @@ db.connect((err) => {
         console.log('Conectado a la base de datos');
     }
 });
-
-db.query = Bluebird.promisify(db.query);
 
 module.exports = db;

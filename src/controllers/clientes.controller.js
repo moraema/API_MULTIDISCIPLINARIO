@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
 const stripe = require('stripe')(process.env.SECRET_STRIPE);
+const Pusher = require('pusher');
+const { pusher } = require('../configs/pusher.config');
+
 
 
 
@@ -11,7 +14,7 @@ const getProduct = async(req, res) => {
         const products = await new Promise((resolve, reject) => {
             db.query(`
                 SELECT 
-                productos.id_productos,
+                productos.id_producto,
                 productos.nombre_producto,
                 productos.precio,
                 productos.descripcion,
@@ -69,15 +72,13 @@ const CreateClient = async(req, res) => {
 };
 
 
-
-
 const getCliente = async(req, res) => {
     try {
 
         const clienteAutenticado = req.cliente.id;
 
         const Clientes = await new Promise((resolve, reject) => {
-            db.query(`SELECT id_clientes, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_clientes = ?;`, [clienteAutenticado], (err, results) => {
+            db.query(`SELECT id_cliente, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_cliente = ?;`, [clienteAutenticado], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -112,7 +113,7 @@ const updateubicacion = async(req, res) => {
         const { ubicacion } = req.body;
 
 
-        const queryCliente = 'UPDATE clientes SET ubicacion = ? WHERE id_clientes = ?;'
+        const queryCliente = 'UPDATE clientes SET ubicacion = ? WHERE id_cliente = ?;'
 
         const client = await new Promise((resolve, reject) => {
             db.query(queryCliente, [ubicacion, clienteAutenticado], (err, results) => {
@@ -143,32 +144,43 @@ const updateubicacion = async(req, res) => {
 }
 
 
-const CreatePedido = async(req, res) => {
+const CreatePedidopusher = async(req, res) => {
     try {
         const clienteAutenticado = req.cliente.id;
         const { total, detallePedido, idPago } = req.body;
 
-        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_clientes, id_metodo_pago) VALUES (?, ?, ?, ?)';
+        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
 
         db.query(queryPedido, [total, detallePedido, clienteAutenticado, idPago], (error, result) => {
             if (error) {
                 res.status(500).json({
-                    message: 'hubo un error al realizar el pedido',
+                    message: 'Hubo un error al realizar el pedido',
                     error: error.message
                 });
             } else {
+
+                pusher.trigger('canal-pedidos', 'nuevo-pedido', {
+                    id: result.insertId,
+                    total,
+                    detallePedido,
+                    idPago,
+                    id_cliente: clienteAutenticado,
+                });
+                console.log('Pedido enviado a Pusher correctamente.');
+
+
                 res.status(201).json({
-                    message: 'el pedido fue realizado correctamente'
+                    message: 'El pedido fue realizado correctamente'
                 });
             }
         });
     } catch (error) {
         res.status(500).json({
-            message: 'hubo un error al realizar el pedido',
+            message: 'Hubo un error al realizar el pedido',
             error: error.message
-        })
+        });
     }
-}
+};
 
 const pagos = async(req, res) => {
     try {
@@ -190,6 +202,7 @@ const pagos = async(req, res) => {
         });
 
         res.json({
+            message: 'el pago se efectuo con exito',
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
             customerId: customer.id,
@@ -209,5 +222,5 @@ module.exports = {
     pagos,
     getCliente,
     updateubicacion,
-    CreatePedido
+    CreatePedidopusher
 }

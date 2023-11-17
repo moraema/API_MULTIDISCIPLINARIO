@@ -12,7 +12,7 @@ const loginAdmin = async(req, res) => {
                 console.log('error al realizar la consulta: ', error);
 
                 res.status(500).json({
-                    message: 'hubo un error añ realizar la consulta'
+                    message: 'hubo un error al realizar la consulta'
                 });
             } else {
                 if (results.length > 0) {

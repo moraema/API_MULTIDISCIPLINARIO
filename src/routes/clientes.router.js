@@ -9,7 +9,7 @@ router.post('/crear-clientes', usuariosController.CreateClient);
 router.post('/pagos', authMidleware.verificarJwt, usuariosController.pagos);
 router.get('/cliente', authMidleware.verificarJwt, usuariosController.getCliente);
 router.put('/actualizar-cliente', authMidleware.verificarJwt, usuariosController.updateubicacion);
-router.post('/pedidos', authMidleware.verificarJwt, usuariosController.CreatePedido);
+router.post('/pedidos-pusher', authMidleware.verificarJwt, usuariosController.CreatePedidopusher);
 
 
 
