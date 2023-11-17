@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/usuarios', usuariosRouter);
+app.use('/', usuariosRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 

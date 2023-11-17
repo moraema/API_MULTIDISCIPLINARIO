@@ -8,7 +8,7 @@ const loginCliente = async(req, res) => {
     const { correo, contraseña } = req.body;
 
     try {
-        db.query('SELECT id_clientes, contraseña FROM clientes WHERE correo = ?', [correo], (error, results) => {
+        db.query('SELECT id_cliente, contraseña FROM clientes WHERE correo = ?', [correo], (error, results) => {
             if (error) {
                 console.log('error al realizar la consulta:', error);
 
@@ -29,7 +29,7 @@ const loginCliente = async(req, res) => {
                             });
                         } else {
                             if (bcryptResult) {
-                                const accountId = results[0].id_clientes;
+                                const accountId = results[0].id_cliente;
 
                                 const payload = {
                                     cliente: {
