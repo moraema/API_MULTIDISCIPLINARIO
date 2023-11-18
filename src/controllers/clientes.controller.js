@@ -144,10 +144,14 @@ const updateubicacion = async(req, res) => {
 }
 
 
+
 const CreatePedidopusher = async(req, res) => {
     try {
         const clienteAutenticado = req.cliente.id;
-        const { total, detallePedido, idPago } = req.body;
+        const { total, productos, idPago } = req.body;
+
+
+        const detallePedido = JSON.stringify(productos);
 
         const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
 
@@ -159,15 +163,16 @@ const CreatePedidopusher = async(req, res) => {
                 });
             } else {
 
-                pusher.trigger('canal-pedidos', 'nuevo-pedido', {
+                const nuevoPedido = {
                     id: result.insertId,
                     total,
-                    detallePedido,
+                    productos,
                     idPago,
                     id_cliente: clienteAutenticado,
-                });
-                console.log('Pedido enviado a Pusher correctamente.');
+                };
 
+                pusher.trigger('canal-pedidos', 'nuevo-pedido', nuevoPedido);
+                console.log('Pedido enviado a Pusher correctamente.');
 
                 res.status(201).json({
                     message: 'El pedido fue realizado correctamente'

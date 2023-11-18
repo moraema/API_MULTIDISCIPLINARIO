@@ -195,44 +195,6 @@ const productoVenta = async(req, res) => {
     }
 };
 
-/*
-const saveTransaction = async(req, res) => {
-    try {
-        const { subtotal, total, idCliente, idPago, cantidad, totalproductos, idproductos } = req.body;
-
-
-        await db.promise().beginTransaction();
-
-
-        const queryVentas = 'INSERT INTO ventas (subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
-        const valuesVentas = [subtotal, total, idCliente, idPago];
-        const [ventasResult] = await db.promise().execute(queryVentas, valuesVentas);
-
-        const idVentas = ventasResult.insertId;
-
-
-        const queryproductosVentas = 'INSERT INTO ventas_productos (cantidad, total, id_producto, id_venta) VALUES (?, ?, ?, ?)';
-        const valuesproductosVentas = [cantidad, totalproductos, idproductos, idVentas];
-        await db.promise().execute(queryproductosVentas, valuesproductosVentas);
-
-
-        await db.promise().commit();
-
-        return res.status(200).json({
-            message: 'Venta creada exitosamente',
-            idVentas: idVentas
-        });
-    } catch (error) {
-        await db.promise().rollback();
-
-        return res.status(500).json({
-            message: 'Ocurrió un error al hacer la venta',
-            error: error.message
-        });
-    }
-};
-*/
-
 const saveTransaction = async(req, res) => {
     try {
         const { subtotal, total, idCliente, idPago, productos } = req.body;
