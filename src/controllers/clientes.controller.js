@@ -52,7 +52,7 @@ const CreateClient = async(req, res) => {
 
         const hashedPassword = await bcrypt.hash(contraseña, saltosBcrypt);
 
-        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña, ubicacion, telefono) VALUES (?, ?, ?, ?, ?, ?)';
+        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña, ubicación, teléfono) VALUES (?, ?, ?, ?, ?, ?)';
         db.query(queryCliente, [nombre, apellido, correo, hashedPassword, ubicacion, telefono], (error, result) => {
             if (error) {
                 res.status(500).json({
@@ -81,7 +81,7 @@ const getCliente = async(req, res) => {
         const clienteAutenticado = req.cliente.id;
 
         const Clientes = await new Promise((resolve, reject) => {
-            db.query(`SELECT id_cliente, nombre, apellido, ubicacion, telefono FROM clientes WHERE id_cliente = ?;`, [clienteAutenticado], (err, results) => {
+            db.query(`SELECT id_cliente, nombre, apellido, ubicación, correo, teléfono FROM clientes WHERE id_cliente = ?;`, [clienteAutenticado], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -116,7 +116,7 @@ const updateubicacion = async(req, res) => {
         const { ubicacion } = req.body;
 
 
-        const queryCliente = 'UPDATE clientes SET ubicacion = ? WHERE id_cliente = ?;'
+        const queryCliente = 'UPDATE clientes SET ubicación = ? WHERE id_cliente = ?;'
 
         const client = await new Promise((resolve, reject) => {
             db.query(queryCliente, [ubicacion, clienteAutenticado], (err, results) => {

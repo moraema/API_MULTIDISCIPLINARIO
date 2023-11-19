@@ -10,8 +10,8 @@ exports.up = function(knex) {
       apellido varchar(45) NOT NULL,
       correo varchar(45) NOT NULL,
       contraseña varchar(245) NOT NULL,
-      ubicacion varchar(45) NOT NULL,
-      telefono varchar(45) NOT NULL,
+      ubicación varchar(45) NOT NULL,
+      teléfono varchar(45) NOT NULL,
       created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (id_cliente)
