@@ -22,7 +22,8 @@ const getProduct = async(req, res) => {
                 productos.precio,
                 productos.descripcion,
                 productos.imagen,
-                categorias.categoria AS categorias
+                categorias.categoria AS categorias,
+                categorias.id_categoria
                 FROM productos
                 INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria;`, (err, results) => {
                 if (err) {
