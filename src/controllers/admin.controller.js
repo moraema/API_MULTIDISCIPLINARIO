@@ -14,8 +14,8 @@ const getPedidos = async(req, res) => {
                      mp.metodo_pago, 
                      c.nombre, 
                      c.apellido, 
-                     c.ubicacion, 
-                     c.telefono
+                     c.ubicación, 
+                     c.teléfono
                      FROM pedidos p 
                      JOIN clientes c ON p.id_cliente = c.id_cliente
                      JOIN metodos_pagos mp ON p.id_metodo_pago = mp.id_metodo_pago 
