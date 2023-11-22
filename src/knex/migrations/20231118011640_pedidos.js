@@ -8,7 +8,7 @@ exports.up = function(knex) {
       id_pedido int NOT NULL AUTO_INCREMENT,
       pedido_fecha timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       total int NOT NULL,
-      detalle_pedido varchar(245) NOT NULL,
+      detalle_pedido LONGTEXT NOT NULL,
       id_cliente int NOT NULL,
       id_metodo_pago int NOT NULL,
       created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
