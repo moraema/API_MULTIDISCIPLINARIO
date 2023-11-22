@@ -8,7 +8,9 @@ const app = express();
 const cors = require("cors");
 
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "http://localhost:3000" }));
+
+
 
 app.use(bodyParser.json());
 app.use('/', usuariosRouter);

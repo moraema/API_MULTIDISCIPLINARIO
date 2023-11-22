@@ -190,11 +190,9 @@ const CreatePedidopusher = async(req, res) => {
 
 const pagos = async(req, res) => {
     try {
-        const { amount, descripcion, pago, nombre } = req.body;
-
+        const { amount, descripcion, pago } = req.body;
 
         const customer = await stripe.customers.create({
-            name: nombre,
 
         });
 
@@ -208,7 +206,7 @@ const pagos = async(req, res) => {
         });
 
         res.json({
-            message: 'el pago se efectuo con exito',
+            message: 'El pago se efectuó con éxito',
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
             customerId: customer.id,
