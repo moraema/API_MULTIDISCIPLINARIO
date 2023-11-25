@@ -84,6 +84,13 @@ const seedUsuarios = () => {
             { id_producto: 44, nombre_producto: "Papas Crispy Grandes", precio: 30.00, descripcion: "Papas crispy 400 gr", imagen: "https://images.rappi.com.mx/products/2111180140-1642456582505.jpg", id_categoria: 4 }
         ];
 
+        const metodo_pago = [
+            { id_metodo_pago: 1, metodo_pago: "Efectivo" },
+            { id_metodo_pago: 2, metodo_pago: "Tarjeta" },
+        ];
+
+
+        const metodopagoquery = 'INSERT INTO metodos_pagos (id_metodo_pago, metodo_pago) VALUES (?, ?)'
         const administradoresquery = 'INSERT INTO administradores (usuario, contraseña) VALUES (?, ?)';
         const categoriaquery = 'INSERT INTO categorias (id_categoria, categoria) VALUES (?, ?)';
         const productosquery = 'INSERT INTO productos (id_producto, nombre_producto, precio, descripcion, imagen, id_categoria) VALUES (?, ?, ? ,? ,?, ?)';
@@ -98,8 +105,8 @@ const seedUsuarios = () => {
             });
         });
 
-        categorias.forEach((administradores) => {
-            connection.query(categoriaquery, [administradores.id_categoria, administradores.categoria], (error) => {
+        categorias.forEach((categorias) => {
+            connection.query(categoriaquery, [categorias.id_categoria, categorias.categoria], (error) => {
                 if (error) {
                     console.log("error al insertar a las categorias: ", error)
                     connection.end();
@@ -116,6 +123,16 @@ const seedUsuarios = () => {
                 }
             });
         });
+
+        metodo_pago.forEach((pagos) => {
+            connection.query(metodopagoquery, [pagos.id_metodo_pago, pagos.metodo_pago], (error) => {
+                if (error) {
+                    console.log("error al insertar los metodos de pagos : ", error);
+                    connection.end();
+                }
+            });
+        });
+
 
         console.log('todos los datos de prueba fueron insertados correctamente');
         connection.end();
