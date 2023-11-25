@@ -19,6 +19,7 @@ const getPedidos = async(req, res) => {
                      FROM pedidos p 
                      JOIN clientes c ON p.id_cliente = c.id_cliente
                      JOIN metodos_pagos mp ON p.id_metodo_pago = mp.id_metodo_pago 
+                     WHERE p.deleted = 0
                      ORDER BY pedido_fecha ASC;`,
                 (err, results) => {
                     if (err) {
@@ -111,9 +112,11 @@ const getVentaProduct = async(req, res) => {
 const deletePedido = async(req, res) => {
     try {
         const pedidoId = req.params.id;
+        const clienteAutenticado = req.cliente.id;
 
         const result = await new Promise((resolve, reject) => {
-            db.query('DELETE FROM pedidos WHERE id_pedido = ?', [pedidoId], (err, results) => {
+            const currentTime = new Date();
+            db.query('UPDATE pedidos SET deleted = 1, deleted_by = ?, deleted_at = ? WHERE id_pedido = ?', [clienteAutenticado, currentTime, pedidoId], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -121,6 +124,7 @@ const deletePedido = async(req, res) => {
                 }
             });
         });
+
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 message: 'No se encontró ningún pedido con el ID proporcionado'
@@ -128,12 +132,12 @@ const deletePedido = async(req, res) => {
         }
 
         res.status(200).json({
-            message: 'el pedido fue eliminado correctamente',
+            message: 'El pedido fue eliminado correctamente',
             deletePedidoId: pedidoId
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'hubo un error al eliminar el pedido',
+            message: 'Hubo un error al eliminar  el pedido',
             error: error.message
         });
     }
@@ -143,15 +147,17 @@ const deletePedido = async(req, res) => {
 
 
 
+
 const saveTransaction = async(req, res) => {
     try {
         const { subtotal, total, idCliente, idPago, productos } = req.body;
+        const clienteAutenticado = req.cliente.id;
 
         await db.promise().beginTransaction();
 
         const queryVentas =
-            'INSERT INTO ventas (subtotal, total, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
-        const valuesVentas = [subtotal, total, idCliente, idPago];
+            'INSERT INTO ventas (subtotal, total, id_cliente, id_metodo_pago, created_by) VALUES (?, ?, ?, ?, ?)';
+        const valuesVentas = [subtotal, total, idCliente, idPago, clienteAutenticado];
         const [ventasResult] = await db.promise().execute(queryVentas, valuesVentas);
 
         const idVentas = ventasResult.insertId;
@@ -161,8 +167,8 @@ const saveTransaction = async(req, res) => {
             const { cantidad, totalProducto, idProducto } = producto;
 
             const queryProductosVentas =
-                'INSERT INTO ventas_productos (cantidad, total, id_producto, id_venta) VALUES (?, ?, ?, ?)';
-            const valuesProductosVentas = [cantidad, totalProducto, idProducto, idVentas];
+                'INSERT INTO ventas_productos (cantidad, total, id_producto, id_venta, created_by) VALUES (?, ?, ?, ?, ?)';
+            const valuesProductosVentas = [cantidad, totalProducto, idProducto, idVentas, clienteAutenticado];
             await db.promise().execute(queryProductosVentas, valuesProductosVentas);
         }
 

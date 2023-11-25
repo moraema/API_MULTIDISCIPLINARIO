@@ -107,45 +107,6 @@ const getCliente = async(req, res) => {
 }
 
 
-const updateubicacion = async(req, res) => {
-    try {
-
-        const clienteAutenticado = req.cliente.id;
-        const { ubicacion } = req.body;
-
-
-        const queryCliente = 'UPDATE clientes SET ubicación = ? WHERE id_cliente = ?;'
-
-        const client = await new Promise((resolve, reject) => {
-            db.query(queryCliente, [ubicacion, clienteAutenticado], (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results.affectedRows);
-                }
-            });
-        });
-
-        if (client == 0) {
-            return res.status(404).json({
-                message: 'no se encontro al cliente a actualizar'
-            });
-        }
-
-        res.status(200).json({
-            message: 'el cliente fue actualizado correctamente',
-            data: client
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: 'hubo un error al actualizar el cliente',
-            error: error.message
-        })
-    }
-}
-
-
-
 const CreatePedidopusher = async(req, res) => {
     try {
         const clienteAutenticado = req.cliente.id;
@@ -154,9 +115,9 @@ const CreatePedidopusher = async(req, res) => {
 
         const detallePedido = JSON.stringify(productos);
 
-        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, id_metodo_pago) VALUES (?, ?, ?, ?)';
+        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, id_metodo_pago, created_by) VALUES (?, ?, ?, ?, ?)';
 
-        db.query(queryPedido, [total, detallePedido, clienteAutenticado, idPago], (error, result) => {
+        db.query(queryPedido, [total, detallePedido, clienteAutenticado, idPago, clienteAutenticado], (error, result) => {
             if (error) {
                 res.status(500).json({
                     message: 'Hubo un error al realizar el pedido',
@@ -279,7 +240,6 @@ module.exports = {
     CreateClient,
     pagos,
     getCliente,
-    updateubicacion,
     CreatePedidopusher,
     categoriaproducto
 }
