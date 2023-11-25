@@ -12,11 +12,16 @@ exports.up = function(knex) {
       id_venta int NOT NULL,
       created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-      PRIMARY KEY (id_ventas_producto,id_producto,id_venta),
+      deleted_at timestamp NULL DEFAULT NULL,
+      deleted tinyint(1) DEFAULT '0',
+      created_by int DEFAULT NULL,
+      updated_by int DEFAULT NULL,
+      deleted_by int DEFAULT NULL,
+      PRIMARY KEY (id_ventas_producto, id_producto, id_venta),
       KEY fk_ventas_productos_productos1_idx (id_producto),
       KEY fk_ventas_productos_ventas1_idx (id_venta),
       CONSTRAINT fk_ventas_productos_productos1 FOREIGN KEY (id_producto) REFERENCES productos (id_producto)
-    ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3
+    ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3
     `);
 };
 
@@ -26,6 +31,6 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema.raw(`
-      DROP TABLE categorias;
+      DROP TABLE ventas_productos;
     `);
 };

@@ -12,12 +12,17 @@ exports.up = function(knex) {
       id_metodo_pago int NOT NULL,
       created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+      deleted_at timestamp NULL DEFAULT NULL,
+      deleted tinyint(1) DEFAULT '0',
+      created_by int DEFAULT NULL,
+      updated_by int DEFAULT NULL,
+      deleted_by int DEFAULT NULL,
       PRIMARY KEY (id_venta),
       KEY fk_ventas_clientes (id_cliente),
       KEY fk_ventas_metodos_pago (id_metodo_pago),
       CONSTRAINT fk_ventas_clientes FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente),
       CONSTRAINT fk_ventas_metodos_pago FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pagos (id_metodo_pago)
-    ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb3
+    ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3
     `);
 };
 
@@ -27,6 +32,6 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema.raw(`
-      DROP TABLE categorias;
+      DROP TABLE ventas
     `);
 };
