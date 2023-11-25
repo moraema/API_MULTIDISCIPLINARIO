@@ -1,4 +1,4 @@
-# Sazon Grill
+# Sazón Grill
 
 
 ## Inicializacion del  proyecto
@@ -12,7 +12,7 @@ Orden en linea: Permite que los clientes puedan explorara el menú y realizar su
 
 ## Tecnologías usadas 
 
-# BACKEND
+# backend
 
 - Base de datos: En este caso para poder almacenar los datos de los prodcutos como el de los pedidos  usamos una base de datos relacional llamada MySQL.
 - bcrypt: Es una biblioteca para el cifrado de contraseñas.
@@ -44,12 +44,12 @@ Orden en linea: Permite que los clientes puedan explorara el menú y realizar su
 
 ## Estructura del proyecto
 - src/ : Contiene nuestro codigo usando en el backend.
-- src/configs: Contiene nuestras coneciones a nuestra base de datos.
-- src/controllers/: contiene a todos nuestros controladores que manejan las consultas y lógica de nuestra rutas.
--src/knex/: contiene las migraciones de nuestra base de datos.
-- src/middlewares/: contiene función de middleware que nos ayuda a la authenticación.
-- src/routes/: Este contiene nuestras rutas de la API.
-- src/seeder/: Este contiene datos iniciales para poder llenar al gunas entidades de nuestra base de datos.
+- src/configs/ : Contiene nuestras coneciones a nuestra base de datos.
+- src/controllers/ : contiene a todos nuestros controladores que manejan las consultas y lógica de nuestra rutas.
+- src/knex/ : contiene las migraciones de nuestra base de datos.
+- src/middlewares/ : contiene función de middleware que nos ayuda a la authenticación.
+- src/routes/ : Este contiene nuestras rutas de la API.
+- src/seeder/ : Este contiene datos iniciales para poder llenar al gunas entidades de nuestra base de datos.
 
 
 Esperemos y te agrade y te lleves una experiencia maravillosa de nuestra Backend Sazón Grill.
