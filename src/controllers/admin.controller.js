@@ -45,34 +45,6 @@ const getPedidos = async(req, res) => {
 
 
 
-const insertVenta = async(req, res) => {
-    try {
-
-        const { subtotal, total, idCliente, idPago } = req.body;
-
-        const queryVentas = 'INSERT INTO ventas ( subtotal, total, id_cliente, id_metodo_pago) VALUES ( ?, ?, ?, ?)';
-
-        db.query(queryVentas, [subtotal, total, idCliente, idPago], (error, result) => {
-            if (error) {
-                res.status(500).json({
-                    message: 'hubo un error al insertar las ventas',
-                    error: error.message
-                });
-            } else {
-                res.status(201).json({
-                    message: 'se insertaron las ventas correctamente'
-                });
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: 'hubo un error al insertar los datos',
-            error: error.message
-        });
-    }
-};
-
-
 const getVentaProduct = async(req, res) => {
     try {
         const { page, limit } = req.query;
@@ -169,31 +141,7 @@ const deletePedido = async(req, res) => {
 
 
 
-const productoVenta = async(req, res) => {
-    try {
-        const { cantidad, total, idproductos, idVentas } = req.body;
 
-        const queryproductosVentas = 'INSERT INTO ventas_productos (cantidad, total, id_productos, id_ventas) VALUES (?, ?, ?, ?);';
-
-        db.query(queryproductosVentas, [cantidad, total, idproductos, idVentas], (error, result) => {
-            if (error) {
-                res.status(500).json({
-                    message: 'hubo un error al insertar los datos',
-                    error: error.message
-                });
-            } else {
-                res.status(201).json({
-                    message: 'Se insertaro las ventas de productos correctamente'
-                });
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: 'hubo un error al insertar los datos',
-            error: error.message
-        })
-    }
-};
 
 const saveTransaction = async(req, res) => {
     try {
