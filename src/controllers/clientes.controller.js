@@ -8,10 +8,7 @@ const { pusher } = require('../configs/pusher.config');
 
 
 
-
-
-
-
+// filtrar a la Home page el primer prdcuto de cada categoria 
 const getProduct = async(req, res) => {
     try {
         const products = await new Promise((resolve, reject) => {
@@ -227,11 +224,62 @@ const pagos = async(req, res) => {
 };
 
 
+// para filtrar el id que pide o los id
+const categoriaproducto = async(req, res) => {
+    try {
+        const categoryIds = req.query.categoryIds;
+        const singleCategoryId = req.query.categoryId;
+
+        let query = `
+            SELECT 
+            productos.id_producto,
+            productos.nombre_producto,
+            productos.precio,
+            productos.descripcion,
+            productos.imagen,
+            categorias.categoria AS categorias,
+            categorias.id_categoria
+            FROM productos
+            INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria`;
+
+        if (singleCategoryId) {
+            query += ` WHERE categorias.id_categoria = ${singleCategoryId}`;
+        } else if (categoryIds) {
+            const categoryArray = categoryIds.split(',');
+            query += ` WHERE categorias.id_categoria IN (${categoryArray.join(',')})`;
+        }
+
+        const products = await new Promise((resolve, reject) => {
+            db.query(query, (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+
+        res.status(200).json({
+            message: 'Se obtuvieron los productos correctamente:',
+            data: products
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Ocurrió un error al obtener los productos',
+            error: error.message
+        });
+    }
+};
+
+
+
+
 module.exports = {
     getProduct,
     CreateClient,
     pagos,
     getCliente,
     updateubicacion,
-    CreatePedidopusher
+    CreatePedidopusher,
+    categoriaproducto
 }
