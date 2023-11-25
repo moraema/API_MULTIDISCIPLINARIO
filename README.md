@@ -7,12 +7,12 @@ Bienvenido al repositorio del proyecto "Sazon Grill" Tu comida favorita
 En nombre de nuestro proyecto, nos enorgullece ofrecer una experiencia de entrega única que combina la excelencia culinaria.
 La cual nos permite ordenar a los clientes comida del restaurante  de una manera conveniente desde cualquier lugar.
 
-### Características
+## Características
 Orden en linea: Permite que los clientes puedan explorara el menú y realizar sus pedidos y tambien realizar sus pagos de la manera mas adecuada ya se por medio de pago con tarjeta o por medio de pago en efectivo.
 
 ## Tecnologías usadas 
 
-# backend
+### backend
 
 - Base de datos: En este caso para poder almacenar los datos de los prodcutos como el de los pedidos  usamos una base de datos relacional llamada MySQL.
 - bcrypt: Es una biblioteca para el cifrado de contraseñas.
