@@ -8,7 +8,6 @@ const { pusher } = require('../configs/pusher.config');
 
 
 
-// filtrar a la Home page el primer prdcuto de cada categoria 
 const getProduct = async(req, res) => {
     try {
         const products = await new Promise((resolve, reject) => {
@@ -179,11 +178,9 @@ const pagos = async(req, res) => {
 };
 
 
-// para filtrar el id que pide o los id
-const categoriaproducto = async(req, res) => {
+const categoriaProductos = async(req, res) => {
     try {
-        const categoryIds = req.query.categoryIds;
-        const singleCategoryId = req.query.categoryId;
+        const categoryName = req.query.categoryName;
 
         let query = `
             SELECT 
@@ -197,11 +194,8 @@ const categoriaproducto = async(req, res) => {
             FROM productos
             INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria`;
 
-        if (singleCategoryId) {
-            query += ` WHERE categorias.id_categoria = ${singleCategoryId}`;
-        } else if (categoryIds) {
-            const categoryArray = categoryIds.split(',');
-            query += ` WHERE categorias.id_categoria IN (${categoryArray.join(',')})`;
+        if (categoryName) {
+            query += ` WHERE categorias.categoria = '${categoryName}'`;
         }
 
         const products = await new Promise((resolve, reject) => {
@@ -235,5 +229,5 @@ module.exports = {
     pagos,
     getCliente,
     CreatePedidopusher,
-    categoriaproducto
+    categoriaProductos
 }

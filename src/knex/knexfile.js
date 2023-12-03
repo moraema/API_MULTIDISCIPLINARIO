@@ -5,7 +5,7 @@ module.exports = {
             host: 'localhost',
             user: 'root',
             password: 'contraseña',
-            database: 'basededatos'
+            database: 'bd'
         },
         migrations: {
             tableName: 'knex_migrations',
