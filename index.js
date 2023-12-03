@@ -25,7 +25,7 @@ app.use('/', usuariosRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Servidor en ejecución en el puerto ${PORT}`);
+
+app.listen(3000, () => {
+    console.log(`Servidor en ejecución en el puerto ${3000}`);
 });
