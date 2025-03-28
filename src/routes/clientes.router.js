@@ -9,7 +9,7 @@ router.get('/categorias', usuariosController.categoriaProductos);
 router.post('/crear-clientes', usuariosController.CreateClient);
 router.post('/pagos', authMidleware.verificarJwt, usuariosController.pagos);
 router.get('/cliente', authMidleware.verificarJwt, usuariosController.getCliente);
-router.post('/pedidos-pusher', authMidleware.verificarJwt, usuariosController.CreatePedidopusher);
+router.post('/pedidos', authMidleware.verificarJwt, usuariosController.CreatePedido);
 
 
 

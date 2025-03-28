@@ -15,14 +15,17 @@
         "@stripe/stripe-js": "^2.1.11",
         "bcrypt": "^5.1.1",
         "bluebird": "^3.7.2",
+        "cloudinary": "^2.6.0",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "jsonwebtoken": "^9.0.2",
         "knex": "^3.0.1",
+        "multer": "^1.4.5-lts.2",
         "mysql": "^2.18.1",
         "mysql2": "^3.6.2",
         "pusher": "^5.2.0",
-        "stripe": "^14.3.0"
+        "stripe": "^14.3.0",
+        "web_api_md": "file:"
     },
     "devDependencies": {
         "nodemon": "^3.0.1"
