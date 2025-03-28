@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
 const stripe = require('stripe')(process.env.SECRET_STRIPE);
-const Pusher = require('pusher');
-const { pusher } = require('../configs/pusher.config');
+
 
 
 
@@ -29,7 +28,7 @@ const getProduct = async(req, res) => {
                 }
             });
         });
-
+        console.log(products)
         res.status(200).json({
             message: 'Se obtuvieron todos los productos correctamente:',
             data: products
@@ -49,7 +48,7 @@ const CreateClient = async(req, res) => {
 
         const hashedPassword = await bcrypt.hash(contraseña, saltosBcrypt);
 
-        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña, ubicación, teléfono) VALUES (?, ?, ?, ?, ?, ?)';
+        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña,  teléfono) VALUES (?, ?, ?, ?, ?)';
         db.query(queryCliente, [nombre, apellido, correo, hashedPassword, ubicacion, telefono], (error, result) => {
             if (error) {
                 res.status(500).json({
@@ -106,7 +105,7 @@ const getCliente = async(req, res) => {
 }
 
 
-const CreatePedidopusher = async(req, res) => {
+const CreatePedido = async(req, res) => {
     try {
         const clienteAutenticado = req.cliente.id;
         const { total, productos, idPago } = req.body;
@@ -131,12 +130,11 @@ const CreatePedidopusher = async(req, res) => {
                     idPago,
                     id_cliente: clienteAutenticado,
                 };
-
-                pusher.trigger('canal-pedidos', 'nuevo-pedido', nuevoPedido);
-                console.log('Pedido enviado a Pusher correctamente.');
+;
 
                 res.status(201).json({
-                    message: 'El pedido fue realizado correctamente'
+                    message: 'El pedido fue realizado correctamente',
+                    data: nuevoPedido
                 });
             }
         });
@@ -234,6 +232,6 @@ module.exports = {
     CreateClient,
     pagos,
     getCliente,
-    CreatePedidopusher,
+    CreatePedido,
     categoriaProductos
 }
