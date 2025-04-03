@@ -3,28 +3,32 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
 const { cloudinary } = require('../service/cloudinary/cloud.service');
+const { sendNotificationByToken } = require('../service/firebase/firebase.service');
 
 
 
 const getPedidos = async (req, res) => {
     try {
-        const adminId = req.cliente.id;
+        const adminId = 9;
         const ventas = await new Promise((resolve, reject) => {
             db.query(`
                 SELECT 
-                    c.nombre AS cliente_nombre, 
-                    c.apellido AS cliente_apellido, 
-                    c.teléfono AS cliente_teléfono,
-                    p.id_pedido, 
-                    p.pedido_fecha, 
-                    p.total, 
-                    p.detalle_pedido
+                c.nombre AS cliente_nombre, 
+                c.apellido AS cliente_apellido, 
+                c.teléfono AS cliente_teléfono,
+                c.token AS token_telefono,
+                p.id_pedido, 
+                p.pedido_fecha, 
+                p.total, 
+                p.detalle_pedido
                 FROM 
                     pedidos p
                 JOIN 
                     clientes c ON p.id_cliente = c.id_cliente
                 WHERE 
-                    p.id_administrador = ?`, 
+                    p.id_administrador = ? 
+                    AND p.deleted = 0;
+                `, 
                 [adminId], 
                 (err, results) => {
                     if (err) {
@@ -114,14 +118,14 @@ const getVentaProduct = async(req, res) => {
 
 
 
-const deletePedido = async(req, res) => {
+const deletePedido = async (req, res) => {
     try {
-        const pedidoId = req.params.id;
+        const productId = req.params.productId; 
         const clienteAutenticado = req.cliente.id;
 
         const result = await new Promise((resolve, reject) => {
             const currentTime = new Date();
-            db.query('UPDATE pedidos SET deleted = 1, deleted_by = ?, deleted_at = ? WHERE id_pedido = ?', [clienteAutenticado, currentTime, pedidoId], (err, results) => {
+            db.query('UPDATE pedidos SET deleted = 1, deleted_by = ?, deleted_at = ? WHERE id_pedido = ?', [clienteAutenticado, currentTime, productId], (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -138,11 +142,11 @@ const deletePedido = async(req, res) => {
 
         res.status(200).json({
             message: 'El pedido fue eliminado correctamente',
-            deletePedidoId: pedidoId
+            deletePedidoId: productId // Usamos productId en lugar de pedidoId
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'Hubo un error al eliminar  el pedido',
+            message: 'Hubo un error al eliminar el pedido',
             error: error.message
         });
     }
@@ -222,8 +226,8 @@ const CreateAdmin = async(req, res) => {
 
 const UpdateProductStatus = async (req, res) => {
     try {
-      const { productId } = req.params; // Obtener el ID del producto desde los parámetros de la URL
-      const { deleted } = req.body; // Obtener el nuevo estado desde el cuerpo de la solicitud
+      const { productId } = req.params; 
+      const { deleted } = req.body; 
   
       if (deleted === undefined) {
         return res.status(400).json({
@@ -231,7 +235,7 @@ const UpdateProductStatus = async (req, res) => {
         });
       }
   
-      // Query para actualizar el estado del producto
+
       const queryUpdate = 'UPDATE productos SET deleted = ?, updated_at = NOW() WHERE id_producto = ?';
       
       db.query(queryUpdate, [deleted, productId], (updateError, updateResult) => {
@@ -384,6 +388,64 @@ const UpdateProducto = async (req, res) => {
     }
   };
   
+
+const updatePedidoStatus = async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const { estatus, token } = req.body;
+  
+      const validStatuses = ['PENDIENTE', 'EN PROCESO', 'REALIZADO'];
+      if (!validStatuses.includes(estatus)) {
+        return res.status(400).json({
+          message: 'Estado inválido. Los estados permitidos son: PENDIENTE, EN PROCESO, REALIZADO.',
+        });
+      }
+  
+      const queryUpdateStatus = `UPDATE pedidos 
+                                 SET estatus = ?, updated_at = NOW() 
+                                 WHERE id_pedido = ?`;
+  
+      // Hacer la consulta con promesas para poder usar 'await'
+      db.query(queryUpdateStatus, [estatus, productId], async (updateError, updateResult) => {
+  
+        if (updateError) {
+          return res.status(500).json({
+            message: 'Hubo un error al actualizar el estado del pedido',
+            error: updateError.message,
+          });
+        }
+  
+        if (updateResult.affectedRows === 0) {
+          return res.status(404).json({
+            message: 'No se encontró el pedido con el ID proporcionado',
+          });
+        }
+  
+        // Solo se envía la notificación si el estado es 'REALIZADO'
+        if (estatus === 'REALIZADO' && token) {
+          try {
+            await sendNotificationByToken(token); // Llamar a la función de notificación
+          } catch (notificationError) {
+            return res.status(500).json({
+              message: 'Hubo un error al enviar la notificación',
+              error: notificationError.message,
+            });
+          }
+        }
+  
+        res.status(200).json({
+          message: 'Estado del pedido actualizado correctamente',
+          data: updateResult,
+        });
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Ocurrió un error al actualizar el pedido',
+        error: error.message,
+      });
+    }
+  };
+  
   
 
 
@@ -397,5 +459,6 @@ module.exports = {
     getProductosByCreator,
     agregarProducto,
     UpdateProductStatus,
-    UpdateProducto
+    UpdateProducto,
+    updatePedidoStatus
 }

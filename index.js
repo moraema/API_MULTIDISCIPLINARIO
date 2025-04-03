@@ -6,7 +6,13 @@ const adminRouter = require('./src/routes/admin.router');
 const authRouter = require('./src/routes/auth.cliente.route');
 const app = express();
 const cors = require("cors");
+const admin = require('firebase-admin');
 
+const serviceFirebase = require('./gastrotech-c750c-firebase-adminsdk-fbsvc-872783264b.json');
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceFirebase),
+});
 
 app.use(cors({ origin: "*" }));
 

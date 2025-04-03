@@ -17,15 +17,16 @@ const getProduct = async(req, res) => {
                 productos.precio,
                 productos.descripcion,
                 productos.imagen,
-                categorias.categoria AS categorias,
-                categorias.id_categoria
+                productos.categoria,
+                productos.created_by
                 FROM productos
-                INNER JOIN categorias ON productos.id_categoria = categorias.id_categoria;`, (err, results) => {
+                WHERE deleted = 0;
+                 `, (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
                     resolve(results);
-                }
+                } 
             });
         });
         console.log(products)
@@ -42,14 +43,55 @@ const getProduct = async(req, res) => {
 }
 
 
+const getPedidos = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+
+        const pedidos = await new Promise((resolve, reject) => {
+            db.query(
+                `SELECT 
+                    id_pedido,
+                    id_cliente,
+                    pedido_fecha,
+                    total,
+                    detalle_pedido,
+                    estatus
+                 FROM pedidos
+                 WHERE id_cliente = ? AND deleted = 0`, 
+                [id], 
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                }
+            );
+        });
+
+        res.status(200).json({
+            message: 'Se obtuvieron los pedidos correctamente',
+            data: pedidos
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Ocurrió un error al obtener los pedidos',
+            error: error.message
+        });
+    }
+};
+
+
 const CreateClient = async(req, res) => {
     try {
-        const { nombre, apellido, correo, contraseña, ubicacion, telefono } = req.body;
+        const { nombre, apellido, correo, contraseña, teléfono, token } = req.body;
 
         const hashedPassword = await bcrypt.hash(contraseña, saltosBcrypt);
 
-        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña,  teléfono) VALUES (?, ?, ?, ?, ?)';
-        db.query(queryCliente, [nombre, apellido, correo, hashedPassword, ubicacion, telefono], (error, result) => {
+        const queryCliente = 'INSERT INTO clientes (nombre, apellido, correo, contraseña, teléfono, token) VALUES (?, ?, ?, ?, ?, ?)';
+        db.query(queryCliente, [nombre, apellido, correo, hashedPassword, teléfono, token], (error, result) => {
             if (error) {
                 res.status(500).json({
                     message: 'Hubo un error al insertar los datos del cliente',
@@ -57,7 +99,8 @@ const CreateClient = async(req, res) => {
                 });
             } else {
                 res.status(200).json({
-                    message: "Los datos se insertaron correctamente en clientes"
+                    message: "Los datos se insertaron correctamente en clientes",
+                    data: result
                 });
             }
         });
@@ -107,15 +150,13 @@ const getCliente = async(req, res) => {
 
 const CreatePedido = async(req, res) => {
     try {
-        const clienteAutenticado = req.cliente.id;
-        const { total, productos, idPago } = req.body;
+       
+        const { total, detalle_pedido, id_cliente, created_by, id_administrador } = req.body;
 
 
-        const detallePedido = JSON.stringify(productos);
+        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, created_by, id_administrador) VALUES (?, ?, ?, ?, ?)';
 
-        const queryPedido = 'INSERT INTO pedidos (total, detalle_pedido, id_cliente, id_metodo_pago, created_by) VALUES (?, ?, ?, ?, ?)';
-
-        db.query(queryPedido, [total, detallePedido, clienteAutenticado, idPago, clienteAutenticado], (error, result) => {
+        db.query(queryPedido, [total, detalle_pedido, id_cliente, created_by, id_administrador], (error, result) => {
             if (error) {
                 res.status(500).json({
                     message: 'Hubo un error al realizar el pedido',
@@ -126,9 +167,9 @@ const CreatePedido = async(req, res) => {
                 const nuevoPedido = {
                     id: result.insertId,
                     total,
-                    productos,
-                    idPago,
-                    id_cliente: clienteAutenticado,
+                    detalle_pedido,
+                    id_cliente,
+                    id_administrador
                 };
 ;
 
@@ -221,11 +262,14 @@ const categoriaProductos = async(req, res) => {
 
 
 
+
+
 module.exports = {
     getProduct,
     CreateClient,
     pagos,
     getCliente,
     CreatePedido,
-    categoriaProductos
+    categoriaProductos,
+    getPedidos
 }

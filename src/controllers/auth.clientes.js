@@ -41,7 +41,8 @@ const loginCliente = async(req, res) => {
 
                                 res.status(200).json({
                                     message: 'inicio de sesion exitoso',
-                                    token
+                                    id_cliente: accountId,
+                                    token,
                                 });
                             } else {
                                 res.status(401).json({
