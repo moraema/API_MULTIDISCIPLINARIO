@@ -9,7 +9,7 @@ const { sendNotificationByToken } = require('../service/firebase/firebase.servic
 
 const getPedidos = async (req, res) => {
     try {
-        const adminId = 9;
+        const adminId = req.cliente.id;
         const ventas = await new Promise((resolve, reject) => {
             db.query(`
                 SELECT 
@@ -319,7 +319,7 @@ const agregarProducto = async (req, res) => {
 
         try {
             // Si el usuario proporciona una imagen, subirla a Cloudinary
-            const imagenParaSubir = imagen || 'https://thumbs.dreamstime.com/b/sin-vector-de-icono-imagen-ning%C3%BAn-s%C3%ADmbolo-disponible-aislado-en-fondo-blanco-adecuado-para-elemento-interfaz-usuario-205805243.jpg'; // URL de la imagen por defecto
+            const imagenParaSubir = imagen || 'https://cdn.pixabay.com/photo/2020/10/05/19/55/hamburger-5630646_640.jpg'; // URL de la imagen por defecto
 
             const uploadResponse = await cloudinary.v2.uploader.upload(imagenParaSubir, {
                 folder: 'gastroTech',
