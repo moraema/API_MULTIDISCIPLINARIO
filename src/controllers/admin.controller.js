@@ -305,9 +305,16 @@ const getProductosByCreator = async (req, res) => {
 
 const agregarProducto = async (req, res) => {
 
-    const creatorId = req.cliente.id; 
+    const creatorId = 1; 
     try {
-        const { nombre_producto, precio, descripcion, imagen, categoria } = req.body;
+        const { nombre_producto, precio, descripcion, categoria } = req.body;
+        const imagen  = req.file;
+
+        if(!imagen){
+            return res.status(400).json({
+                message: 'La imagen es obligatoria'
+            });
+        }
 
         if (!nombre_producto || !precio || !descripcion || !categoria) {
             return res.status(400).json({
@@ -318,10 +325,9 @@ const agregarProducto = async (req, res) => {
         let imagenUrl;
 
         try {
-            // Si el usuario proporciona una imagen, subirla a Cloudinary
-            const imagenParaSubir = imagen || 'https://cdn.pixabay.com/photo/2020/10/05/19/55/hamburger-5630646_640.jpg'; // URL de la imagen por defecto
+            
 
-            const uploadResponse = await cloudinary.v2.uploader.upload(imagenParaSubir, {
+            const uploadResponse = await cloudinary.v2.uploader.upload(imagen.path, {
                 folder: 'gastroTech',
                 format: "jpg"
             });

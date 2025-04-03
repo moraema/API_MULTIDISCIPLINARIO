@@ -15,7 +15,7 @@ admin.initializeApp({
 });
 
 app.use(cors({ origin: "*" }));
-
+app.use(express.json());
 
 
 app.use(bodyParser.json());
