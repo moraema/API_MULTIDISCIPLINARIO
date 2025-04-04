@@ -18,6 +18,9 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 
+
+
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/', usuariosRouter);
 app.use('/auth', authRouter);

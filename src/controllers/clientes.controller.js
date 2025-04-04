@@ -187,7 +187,13 @@ const CreatePedido = async(req, res) => {
     }
 };
 
+
+
+
+
+
 const pagos = async(req, res) => {
+
     try {
         const { amount, descripcion, pago } = req.body;
 
