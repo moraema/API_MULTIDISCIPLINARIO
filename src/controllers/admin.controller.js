@@ -305,7 +305,7 @@ const getProductosByCreator = async (req, res) => {
 
 const agregarProducto = async (req, res) => {
 
-    const creatorId = 1; 
+    const creatorId = req.cliente.id; 
     try {
         const { nombre_producto, precio, descripcion, categoria } = req.body;
         const imagen  = req.file;
